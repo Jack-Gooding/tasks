@@ -19,7 +19,10 @@ createTable.run();
 
 const insertData = db.prepare(`INSERT INTO tasks(task, description, dateAdded, status) VALUES (?, ?, ?, ?)`);
 const readData = db.prepare(`SELECT rowid, * FROM tasks`);
-//const updateCategory = db.prepare(`UPDATE account SET category = ? WHERE rowid = ?`);
+
+const updateCategory = db.prepare(`UPDATE tasks SET category = ? WHERE rowid = ?`);
+const updateStatus = db.prepare(`UPDATE tasks SET status = ? WHERE rowid = ?`);
+
 /*
 const insertMany = db.transaction((data) => {
   for (const row of data) {
@@ -37,8 +40,8 @@ const insertMany = db.transaction((data) => {
 
 
 
-insertData.run("Testing","adding data",moment().format("Y-MM-DD, HH:mm:ss"),Math.round(Math.random()));
-console.log(readData.all());
+insertData.run("Testing","adding data",moment().format("Y-MM-DD, HH:mm:ss"),0);
+console.log();
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -52,11 +55,9 @@ app.get('/', (req, res) => {
 
 
 
-app.get('/api/categories', (req, res) => {
-  console.log("categories");
-  let response = readData.all();
-  res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify(response));
+app.get('/api/tasks', (req, res) => {
+  console.log("tasks");
+  res.send(readData.all());
 })
 
 app.get('/api/greeting', (req, res) => {
@@ -65,14 +66,27 @@ app.get('/api/greeting', (req, res) => {
   res.send(JSON.stringify({ greeting: `Hello ${name}!`}));
 });
 
-app.post('/api/categories', (req, res) => {
+app.post('/api/tasks', (req, res) => {
   console.log(req.body);
   res.setHeader('Content-Type', 'application/json');
   res.header("Access-Control-Allow-Origin", "*");
-  res.send(JSON.stringify({Category: `${req.body.category}!`}));
-  newCategory = req.body.category;
-  rowId = req.body.rowId;
-  updateCategory.run(req.body.category, rowId);
+  res.send(JSON.stringify({Response: `${req.body[Object.keys(req.body)[0]]}!`}));
+
+  rowid = req.body.rowid;
+
+  if (req.body.header === "status") {
+
+    let newStatus = (req.body.value != 1) ? 1 : 0;
+    updateStatus.run(newStatus, rowid)
+
+  } else if (req.body.header === "category") {
+
+    updateCategory.run(req.body.value, rowid);
+
+  }
+
+
+
 
 });
 
