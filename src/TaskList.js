@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import {Table, FormGroup, Label, Input} from 'reactstrap';
+import {Table} from 'reactstrap';
+import TableRow from './TableRow';
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -32,22 +33,7 @@ export default class TaskList extends React.Component {
    return this.props.data.map((row, rowIndex) => {
       let headers = Object.keys(this.props.data[0]);
       return (
-         <tr scope="row" key={row[headers[0]]}>
-         <td>{row.rowid}<FormGroup check inline>
-          <Label check>
-             <Input type="checkbox" />
-          </Label>
-        </FormGroup></td>
-         <td>{row.category}</td>
-         <td>{row.status}</td>
-         <td>{row.task}</td>
-         <td>{row.description}</td>
-         <td>{row.notes}</td>
-         <td>{row.dateAdded}</td>
-         <td>{row.dateDue}</td>
-         <td>{row.dateCompleted}</td>
-
-         </tr>
+        <TableRow onEdit={(e) => this.props.onEdit(e)} rowData={row} rowIndex={rowIndex} headers={headers}/>
        )
    })
 }
@@ -68,17 +54,19 @@ console.log(row);
   render() {
 
     return (
-      <Table striped bordered hover sm>
+      <Table striped bordered hover>
         <thead>
-          <th>Row ID</th>
-          <th>Category</th>
-          <th>Status</th>
-          <th>Task</th>
-          <th>Description</th>
-          <th>Notes</th>
-          <th>Date Added</th>
-          <th>Date Due</th>
-          <th>Date Completed</th>
+          <tr>
+            <th>Row ID</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Notes</th>
+            <th>Date Added</th>
+            <th>Date Due</th>
+            <th>Date Completed</th>
+          </tr>
         </thead>
         <tbody>
           {this.renderTableRows()}

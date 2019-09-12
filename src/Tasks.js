@@ -13,6 +13,7 @@ export default class Tasks extends React.Component {
     };
     this.handleClick = this.handleClick.bind(this);
     this.updateCategory = this.updateCategory.bind(this);
+    this.updateValue = this.updateValue.bind(this);
   }
 
   componentDidMount() {
@@ -24,9 +25,24 @@ export default class Tasks extends React.Component {
   )
 }
 
+updateValue(e) {
+  console.log(e);
+  let data = this.state.data;
+  data[e.row][e.name] = e.value;
+  this.setState({data: data});
+  axios.post(`/api/tasks`, {
+    header: e.name,
+    rowid: e.row+1,
+    value: e.value
+  })
+    .then(res => {
+      console.log(res.data);
+    })
+}
+
 updateCategory(header,rowid,value) {
   console.log('Click happened');
-  console.log(header);  
+  console.log(header);
   axios.post(`/api/tasks`, {
     header: header,
     rowid: rowid,
@@ -46,7 +62,7 @@ updateCategory(header,rowid,value) {
     return (
       <div>
         <h1>Tasks: <Badge color="info">{this.state.data.length}</Badge></h1>
-        <TaskList data={this.state.data} onClick={this.updateCategory}/>
+        <TaskList data={this.state.data} onEdit={this.updateValue} onClick={this.updateCategory}/>
       </div>
     );
 }
