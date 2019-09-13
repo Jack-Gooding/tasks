@@ -22,6 +22,9 @@ const readData = db.prepare(`SELECT rowid, * FROM tasks`);
 
 const updateCategory = db.prepare(`UPDATE tasks SET category = ? WHERE rowid = ?`);
 const updateStatus = db.prepare(`UPDATE tasks SET status = ? WHERE rowid = ?`);
+const updateTask = db.prepare(`UPDATE tasks SET task = ? WHERE rowid = ?`);
+const updateDescription = db.prepare(`UPDATE tasks SET description = ? WHERE rowid = ?`);
+const updateCompletedDate = db.prepare(`UPDATE tasks SET dateCompleted = ? WHERE rowid = ?`);
 
 /*
 const insertMany = db.transaction((data) => {
@@ -70,18 +73,33 @@ app.post('/api/tasks', (req, res) => {
   console.log(req.body);
   res.setHeader('Content-Type', 'application/json');
   res.header("Access-Control-Allow-Origin", "*");
-  res.send(JSON.stringify({Response: `${req.body[Object.keys(req.body)[0]]}!`}));
+  res.send(JSON.stringify({Response: `${req.body[Object.keys(req.body)[0]]}!`, value: req.body.data}));
 
   rowid = req.body.rowid;
 
   if (req.body.header === "status") {
 
-    let newStatus = (req.body.value != 1) ? 1 : 0;
-    updateStatus.run(newStatus, rowid)
+    let newStatus = (req.body.value) ? 1 : 0;
+    let compDate;
+    console.log("Setting status to"+req.body.value);
+    updateStatus.run(newStatus, rowid);
+    if (newStatus == 1) {
+      updateCompletedDate.run(moment().format("Y-MM-DD, HH:mm:ss"), rowid);
+    } else if (newStatus == 0) {
+      updateCompletedDate.run(null, rowid);
+    }
 
   } else if (req.body.header === "category") {
 
     updateCategory.run(req.body.value, rowid);
+
+  } else if (req.body.header === "task") {
+
+    updateTask.run(req.body.value, rowid);
+
+  } else if (req.body.header === "description") {
+
+    updateDescription.run(req.body.value, rowid);
 
   }
 

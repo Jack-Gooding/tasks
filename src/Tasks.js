@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import TaskList from './TaskList';
-import {Badge} from 'reactstrap';
+import {Container, Jumbotron, Badge} from 'reactstrap';
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -60,10 +60,13 @@ updateCategory(header,rowid,value) {
 
   render() {
     return (
-      <div>
+      <Container>
+      <Jumbotron>
         <h1>Tasks: <Badge color="info">{this.state.data.length}</Badge></h1>
+        </Jumbotron>
+
         <TaskList data={this.state.data} onEdit={this.updateValue} onClick={this.updateCategory}/>
-      </div>
+      </Container>
     );
 }
 }

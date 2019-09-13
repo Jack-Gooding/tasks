@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import {Alert, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, Button} from 'reactstrap';
+import {Alert, CustomInput, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, Button} from 'reactstrap';
+import EditData from './EditData';
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -8,50 +9,25 @@ export default class TableRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      statusEdit : false,
-      taskEdit: false,
-    }
-    this.handleClick = this.handleClick.bind(this);
-    this.toggleEditing = this.toggleEditing.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.updateValue = this.updateValue.bind(this);
-    this.onFormSubmit = this.onFormSubmit.bind(this);
+      status: this.props.rowData.status,
+    };
+    this.handleToggle = this.handleToggle.bind(this);
   }
 
-
-  toggleEditing(e) {
-    let name;
-    console.log(e);
-    if (Object.keys(e) > 1) {
-    name = e.target.name;
-    } else {
-      name = e;
-    }
-    this.setState({[`${name}Edit`]: `!this.state.${name}Edit`});
+  componentDidMount() {
+    this.setState({row: {}});
+    this.setState({row: this.props.rowData});
   }
 
-  handleKeyDown(e) {
-    if (e.key === 'Enter') {
-      this.updateValue(e);
-    }
-  }
-
-  updateValue(e) {
-    this.toggleEditing(e);
+  handleToggle(e) {
+    this.setState({status: !this.state.status});
     this.props.onEdit({
-                value:e.target.value,
-                row: this.props.rowIndex,
+                value:e.target.checked,
+                row:  this.props.rowIndex,
                 name: e.target.name
                       });
   }
 
-  handleClick() {
-    console.log("test")
-  }
-
-  onFormSubmit() {
-    alert(JSON.stringify(this.state, null, '  '));
-  }
 
   render() {
     let row = this.props.rowData;
@@ -65,31 +41,10 @@ export default class TableRow extends React.Component {
      </FormGroup></td>
       <td>{row.category}</td>
       <td>
-      {this.state.statusEdit ?
-        <Form onSubmit={this.onFormSubmit}>
-          <FormGroup>
-          <InputGroup>
-            <Input name="status" onKeyDown={(e) => this.handleKeyDown(e)} placeholder="" />
-            <InputGroupAddon addonType="append"><Button color="info" name="status" onClick={(e) => this.updateValue(e)}>✔</Button></InputGroupAddon>
-          </InputGroup>
-          </FormGroup>
-        </Form>
-        :
-         <p name="status" onClick={(e) => this.toggleEditing(e)}>{row.status}</p>}
-         </td>
-         <td>
-         {this.state.taskEdit ?
-           <Form onSubmit={this.onFormSubmit}>
-             <FormGroup>
-             <InputGroup>
-               <Input name="task" onKeyDown={(e) => this.handleKeyDown(e)} placeholder="" />
-               <InputGroupAddon addonType="append"><Button color="info" name="task" onClick={(e) => this.updateValue(e)}>✔</Button></InputGroupAddon>
-             </InputGroup>
-             </FormGroup>
-           </Form>
-           :
-            <p color="info" name="task" onClick={e => this.toggleEditing("task")}>{row.task}</p>}</td>
-      <td>{row.description}</td>
+      <input name="status" type="checkbox" checked={(this.state.status == 1) ? true : false} onClick={this.handleToggle.bind(this)}></input>
+      </td>
+      <EditData data={this.props.rowData.task} name="task" index={this.props.rowIndex} onEdit={this.props.onEdit} />
+      <EditData data={this.props.rowData.description} name="description" index={this.props.rowIndex} onEdit={this.props.onEdit} />
       <td>{row.notes}</td>
       <td>{row.dateAdded}</td>
       <td>{row.dateDue}</td>
@@ -99,3 +54,17 @@ export default class TableRow extends React.Component {
     );
 }
 }
+/*
+<td>
+{this.state.taskEdit ?
+  <Form onSubmit={this.onFormSubmit}>
+  <FormGroup>
+  <InputGroup>
+  <Input name="task" onKeyDown={(e) => this.handleKeyDown(e)} onChange={this.handleChange.bind(this)} placeholder="" value={rowState.task}/>
+  <InputGroupAddon addonType="append"><Button color="info" name="task" type="submit" onClick={(e) => this.updateValue(e)}>✔</Button></InputGroupAddon>
+  </InputGroup>
+  </FormGroup>
+  </Form>
+  :
+  <p color="info" name="task" onClick={() => this.toggleEditing("task")}>{row.task}</p>}</td>
+*/

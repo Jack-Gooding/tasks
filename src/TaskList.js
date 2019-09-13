@@ -33,7 +33,7 @@ export default class TaskList extends React.Component {
    return this.props.data.map((row, rowIndex) => {
       let headers = Object.keys(this.props.data[0]);
       return (
-        <TableRow onEdit={(e) => this.props.onEdit(e)} rowData={row} rowIndex={rowIndex} headers={headers}/>
+        <TableRow key={rowIndex} onEdit={(e) => this.props.onEdit(e)} rowData={row} rowIndex={rowIndex} headers={headers}/>
        )
    })
 }
@@ -54,10 +54,10 @@ console.log(row);
   render() {
 
     return (
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Row ID</th>
+      <Table sm striped hover style={{borderTop: 0}}>
+        <thead style={{borderTop: 0}}>
+          <tr style={{borderTop: 0}}>
+            <th style={{background: "#297ca6", color: "white", borderRadius: "10px 0 0 0"}}>Row ID</th>
             <th>Category</th>
             <th>Status</th>
             <th>Task</th>
@@ -65,10 +65,10 @@ console.log(row);
             <th>Notes</th>
             <th>Date Added</th>
             <th>Date Due</th>
-            <th>Date Completed</th>
+            <th style={{background: "#297ca6", color: "white", borderRadius: "0 10px 0 0 "}}>Date Completed</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{"border-radius": "10px"}}>
           {this.renderTableRows()}
         </tbody>
       </Table>
