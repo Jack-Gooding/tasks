@@ -1,0 +1,61 @@
+.complete {
+  padding: 0;
+  transition-duration: 0.25s;
+  color: #aaa;
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.complete:hover {
+  color: #ccc;
+}
+
+.incomplete {
+  padding: 0;
+  transition-duration: 0.25s;
+  color: #000;
+  position: relative;
+  white-space: nowrap;
+}
+
+.incomplete:hover {
+  color: #666;
+}
+
+.trashIcon {
+  color: #334;
+}
+
+.trashIcon:hover {
+  color: #667;
+  transform: scale(1.2);
+}
+
+.trashIcon:active {
+  transform: scale(1.1);
+  color: #445;
+}
+
+/*
+.incomplete::after {
+  transition-delay: 1s;
+  content: "";
+  display: none;
+  position: relative;
+  width: 100%;
+  border-bottom: solid 1px transparent;
+  top:-500.75em;
+}
+
+
+.complete::after {
+  transition-delay: 1s;
+  content: "";
+  display: block;
+  position: relative;
+  width: 100%;
+  border-bottom: solid 1px #aaa;
+  top:-.75em;
+}
+*/

@@ -1,7 +1,9 @@
 import React from 'react';
 import axios from 'axios';
-import {Alert, CustomInput, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, Button} from 'reactstrap';
+import moment from 'moment';
+import { FaTrashAlt } from 'react-icons/fa';
 import EditData from './EditData';
+import styles from './css/TableRow.module.css';
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -9,50 +11,60 @@ export default class TableRow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      status: this.props.rowData.status,
+      loaded: false,
+      row: this.props.rowData
     };
     this.handleToggle = this.handleToggle.bind(this);
+    this.deleteClick = this.deleteClick.bind(this);
   }
 
   componentDidMount() {
-    this.setState({row: {}});
-    this.setState({row: this.props.rowData});
+    this.setState({loaded: true});
   }
 
   handleToggle(e) {
-    this.setState({status: !this.state.status});
     this.props.onEdit({
                 value:e.target.checked,
-                row:  this.props.rowIndex,
+                row:  this.props.rowData.rowid,
                 name: e.target.name
                       });
+  }
+
+  deleteClick(e) {
+    this.props.deleteRow(this.props.rowData.rowid);
   }
 
 
   render() {
     let row = this.props.rowData;
-    return (
-      <tr key={row[this.props.headers[0]]}>
-      <td>{row.rowid}
-      <FormGroup check inline>
-       <Label check>
-          <Input type="checkbox" />
-       </Label>
-     </FormGroup></td>
-      <td>{row.category}</td>
-      <td>
-      <input name="status" type="checkbox" checked={(this.state.status == 1) ? true : false} onClick={this.handleToggle.bind(this)}></input>
+    let style = (this.props.status == 1) ? styles.complete : styles.incomplete;
+    if (this.state.loaded) {
+      //console.log(row);
+      //console.log(this.props.status);
+      return (
+      <tr key={this.props.rowData.rowid}>
+      <td className={style}>
+        <input name="status" type="checkbox" defaultChecked={(this.props.status === 1 || this.props.status === true)} onClick={this.handleToggle.bind(this)}></input>
       </td>
-      <EditData data={this.props.rowData.task} name="task" index={this.props.rowIndex} onEdit={this.props.onEdit} />
-      <EditData data={this.props.rowData.description} name="description" index={this.props.rowIndex} onEdit={this.props.onEdit} />
-      <td>{row.notes}</td>
-      <td>{row.dateAdded}</td>
-      <td>{row.dateDue}</td>
-      <td>{row.dateCompleted}</td>
-
+      <td className={style}>{row.rowid}</td>
+      <EditData style={style} data={row.category || "--"} row={this.props.rowData.rowid} name="category" index={this.props.rowIndex} onEdit={this.props.onEdit} />
+      <EditData style={style} data={row.task || "--"} row={this.props.rowData.rowid} name="task" index={this.props.rowIndex} onEdit={this.props.onEdit} />
+      <EditData style={style} data={row.description || "--"} row={this.props.rowData.rowid} name="description" index={this.props.rowIndex} onEdit={this.props.onEdit} />
+      <EditData style={style} data={row.notes || "--"} row={this.props.rowData.rowid} name="notes" index={this.props.rowIndex} onEdit={this.props.onEdit} />
+      <td className={style}>{moment(row.dateAdded).fromNow()}</td>
+      <td className={style}>{(row.dateDue) ? moment(row.dateDue).fromNow() : "--"}</td>
+      <td className={style}>{(row.dateCompleted) ? moment(row.dateCompleted).fromNow() : "--"}</td>
+      <td className={style}><FaTrashAlt onClick={this.deleteClick} className={styles.trashIcon} /></td>
       </tr>
-    );
-}
+      );
+    } else {
+        return (
+          <tr>
+            <td>loading...</td>
+          </tr>
+        )
+    }
+  }
 }
 /*
 <td>

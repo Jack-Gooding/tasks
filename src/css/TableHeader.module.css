@@ -1,0 +1,29 @@
+:root {
+  --radius: 5px;
+  --bgColour: #297ca6;
+}
+
+.tr {
+  border-top: 0;
+  color: #fff;
+  padding:0;
+  margin:0;
+  overflow: hidden;
+  word-wrap: none;
+  }
+
+.th {
+  border-top: 0 !important;
+  padding: 0.75em 0 0.75em 0;
+  background: var(--bgColour);
+  white-space: nowrap;
+}
+
+
+.th:first-of-type {
+  border-radius: 5px 0 0 0;
+}
+
+.th:last-of-type {
+  border-radius: 0 5px 0 0;
+}

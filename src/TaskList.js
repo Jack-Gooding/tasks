@@ -2,23 +2,19 @@ import React from 'react';
 import axios from 'axios';
 import {Table} from 'reactstrap';
 import TableRow from './TableRow';
-
+import styles from './css/TableHeader.module.css';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 export default class TaskList extends React.Component {
   constructor(props) {
     super(props);
-    this.handleClick = this.handleClick.bind(this);
   }
 
 
-  handleClick() {
-    console.log("test")
-  }
 
   renderTableHeader() {
      let header = Object.keys(this.props.data[0]);
-     console.log(Object.keys(this.props.data[0]));
+     //console.log(Object.keys(this.props.data[0]));
      return header.map((key, index) => {
         return <th key={index}>{key}</th>
      })
@@ -32,14 +28,24 @@ export default class TaskList extends React.Component {
    renderTableRows() {
    return this.props.data.map((row, rowIndex) => {
       let headers = Object.keys(this.props.data[0]);
+      let existingCategory = true;
+        for (let i = 0; i < this.props.data.length; i++) {
+          if (this.props.data[i].category === this.props.category) {
+            existingCategory = false;
+          }
+        }
+        if (row.category === this.props.category || existingCategory) {
       return (
-        <TableRow key={rowIndex} onEdit={(e) => this.props.onEdit(e)} rowData={row} rowIndex={rowIndex} headers={headers}/>
+        <TableRow key={rowIndex} status={row.status} onEdit={(e) => this.props.onEdit(e)} deleteRow={(e) => this.props.deleteRow(e)} rowData={row} rowIndex={rowIndex} headers={headers}/>
        )
+     } else {
+       return (null)
+     }
    })
 }
 
 renderTableData(row) {
-console.log(row);
+//console.log(row);
  return this.props.data.map((col, index) => {
     return (
        <td>
@@ -48,27 +54,27 @@ console.log(row);
     )
  })
 }
-
 //<tr>{this.renderTableHeader()}</tr>
 
   render() {
 
     return (
-      <Table sm striped hover style={{borderTop: 0}}>
-        <thead style={{borderTop: 0}}>
-          <tr style={{borderTop: 0}}>
-            <th style={{background: "#297ca6", color: "white", borderRadius: "10px 0 0 0"}}>Row ID</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Task</th>
-            <th>Description</th>
-            <th>Notes</th>
-            <th>Date Added</th>
-            <th>Date Due</th>
-            <th style={{background: "#297ca6", color: "white", borderRadius: "0 10px 0 0 "}}>Date Completed</th>
+      <Table striped hover size="sm">
+        <thead>
+          <tr className={styles.tr}>
+            <th className={styles.th}>Status</th>
+            <th className={styles.th}>Row ID</th>
+            <th className={styles.th}>Category</th>
+            <th className={styles.th}>Task</th>
+            <th className={styles.th}>Description</th>
+            <th className={styles.th}>Notes</th>
+            <th className={styles.th}>Date Added</th>
+            <th className={styles.th}>Date Due</th>
+            <th className={styles.th}>Date Completed</th>
+            <th className={styles.th}>Delete</th>
           </tr>
         </thead>
-        <tbody style={{"border-radius": "10px"}}>
+        <tbody>
           {this.renderTableRows()}
         </tbody>
       </Table>

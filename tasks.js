@@ -13,18 +13,23 @@ const createTable = db.prepare(`CREATE TABLE IF NOT EXISTS tasks(
                     dateDue TEXT,
                     dateCompleted TEXT,
                     category TEXT,
-                    status INTEGER NOT NULL
+                    status INTEGER NOT NULL,
+                    archive INTEGER NOT NULL
 )`);
 createTable.run();
 
-const insertData = db.prepare(`INSERT INTO tasks(task, description, dateAdded, status) VALUES (?, ?, ?, ?)`);
-const readData = db.prepare(`SELECT rowid, * FROM tasks`);
+const insertData = db.prepare(`INSERT INTO tasks(task, description, dateAdded, category, status, archive) VALUES (?, ?, ?, ?, ?, 0)`);
+const readData = db.prepare(`SELECT rowid, * FROM tasks WHERE archive != 1`);
 
 const updateCategory = db.prepare(`UPDATE tasks SET category = ? WHERE rowid = ?`);
 const updateStatus = db.prepare(`UPDATE tasks SET status = ? WHERE rowid = ?`);
 const updateTask = db.prepare(`UPDATE tasks SET task = ? WHERE rowid = ?`);
+const updateNotes = db.prepare(`UPDATE tasks SET notes = ? WHERE rowid = ?`);
 const updateDescription = db.prepare(`UPDATE tasks SET description = ? WHERE rowid = ?`);
 const updateCompletedDate = db.prepare(`UPDATE tasks SET dateCompleted = ? WHERE rowid = ?`);
+
+//const deleteRow = db.prepare(`DELETE FROM tasks WHERE rowid = ?`);
+const deleteRow = db.prepare(`UPDATE tasks SET archive = 1 WHERE rowid = ?`);
 
 /*
 const insertMany = db.transaction((data) => {
@@ -41,14 +46,11 @@ const insertMany = db.transaction((data) => {
 //https://medium.com/@subalerts/create-dynamic-table-from-json-in-react-js-1a4a7b1146ef
 //https://dev.to/abdulbasit313/an-easy-way-to-create-a-customize-dynamic-table-in-react-js-3igg
 
-
-
-insertData.run("Testing","adding data",moment().format("Y-MM-DD, HH:mm:ss"),0);
-console.log();
-
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static('public')); /* this line tells Express to use the public folder as our static folder from which we can serve static files*/
+
 
 app.get('/', (req, res) => {
   const name = req.query.name || 'World';
@@ -73,7 +75,6 @@ app.post('/api/tasks', (req, res) => {
   console.log(req.body);
   res.setHeader('Content-Type', 'application/json');
   res.header("Access-Control-Allow-Origin", "*");
-  res.send(JSON.stringify({Response: `${req.body[Object.keys(req.body)[0]]}!`, value: req.body.data}));
 
   rowid = req.body.rowid;
 
@@ -84,7 +85,7 @@ app.post('/api/tasks', (req, res) => {
     console.log("Setting status to"+req.body.value);
     updateStatus.run(newStatus, rowid);
     if (newStatus == 1) {
-      updateCompletedDate.run(moment().format("Y-MM-DD, HH:mm:ss"), rowid);
+      updateCompletedDate.run(moment().format("Y-MM-DD HH:mm:ss"), rowid);
     } else if (newStatus == 0) {
       updateCompletedDate.run(null, rowid);
     }
@@ -101,10 +102,45 @@ app.post('/api/tasks', (req, res) => {
 
     updateDescription.run(req.body.value, rowid);
 
+  } else if (req.body.header === "notes") {
+
+    updateNotes.run(req.body.value, rowid);
   }
 
 
+  res.send(readData.all());
 
+
+});
+
+app.post('/api/delete', (req, res) => {
+  console.log(req.body.rowid);
+  let rowid = req.body.rowid;
+
+  deleteRow.run(rowid);
+
+
+  res.setHeader('Content-Type', 'application/json');
+  res.header("Access-Control-Allow-Origin", "*");
+
+
+  res.send(readData.all());
+
+});
+
+app.post('/api/create', (req, res) => {
+
+  let category = "";
+  if (req.body.category) {
+    category = req.body.category;
+  }
+  console.log(req.body);
+  res.setHeader('Content-Type', 'application/json');
+  res.header("Access-Control-Allow-Origin", "*");
+
+  insertData.run("New task","",moment().format("Y-MM-DD HH:mm:ss"),category,0);
+
+  res.send(readData.all());
 
 });
 

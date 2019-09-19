@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import {Form, FormGroup, Input, InputGroup, InputGroupAddon, Button} from 'reactstrap';
+import {Form, FormGroup, Input, InputGroup} from 'reactstrap';
+
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
@@ -9,7 +10,8 @@ export default class TableRow extends React.Component {
     super(props);
     this.state = {
       edit: false,
-      data: {}
+      data: {},
+      input: "",
     }
     this.handleClick = this.handleClick.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
@@ -20,6 +22,13 @@ export default class TableRow extends React.Component {
 
   componentDidMount() {
     this.setState({data: this.props.data});
+  }
+
+  componentDidUpdate() {
+    if(this.nameInput) {
+      this.nameInput.focus();
+    }
+
   }
 
 
@@ -37,10 +46,10 @@ export default class TableRow extends React.Component {
 
   updateValue(e) {
     this.toggleEditing(e.target.name);
-    console.log(e.target.value);
+    //console.log(e.target.value);
     this.props.onEdit({
                 value:e.target.value,
-                row:  this.props.index,
+                row:  this.props.row,
                 name: e.target.name
                       });
   }
@@ -50,9 +59,9 @@ export default class TableRow extends React.Component {
   }
 
   handleChange(event) {
-    console.log(event.target.value)
-    console.log(event.target.name)
-    this.setState({data: event.target.value});
+    //console.log(event.target.value)
+    //console.log(event.target.name)
+    this.setState({input: event.target.value});
   }
 
   onFormSubmit() {
@@ -65,17 +74,12 @@ export default class TableRow extends React.Component {
     return (
         <td>
          {this.state.edit ?
-           <Form onSubmit={this.onFormSubmit}>
-             <FormGroup>
-             <InputGroup>
-               <Input style={{margin: 0, width:"60%"}} name={this.props.name} onKeyDown={(e) => this.handleKeyDown(e)} onChange={this.handleChange.bind(this)} onClick={this.handleChange.bind(this)} placeholder="" value={stateData}/>
-               <InputGroupAddon style={{margin: 0, width:"20%"}} addonType="append"><Button color="info" name={this.props.name} type="submit" onClick={(e) => this.updateValue(e)}>✔</Button></InputGroupAddon>
-             </InputGroup>
-             </FormGroup>
-           </Form>
+               <Input autoFocus ref={(input) => { this.nameInput = input; }} name={this.props.name} onKeyDown={(e) => this.handleKeyDown(e)} onChange={this.handleChange.bind(this)} onClick={this.handleChange.bind(this)} placeholder={propData} value={this.state.input}/>
            :
-            <p color="info" name={this.props.name} onClick={this.toggleEditing.bind(this)}>{propData}</p>}
+            <p className={this.props.style} color="info" name={this.props.name} onClick={this.toggleEditing.bind(this)}>{propData}</p>}
             </td>
     );
 }
 }
+
+//<InputGroupAddon style={{margin: 0, width:"20%"}} addonType="append"><Button color="info" name={this.props.name} type="submit" onClick={(e) => this.updateValue(e)}>✔</Button></InputGroupAddon>
